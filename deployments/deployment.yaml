@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: utility-02cn
+  name: utility-02cn
+  namespace: zero-to-cloud-native
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: utility-02cn
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: utility-02cn
+    spec:
+      imagePullSecrets:
+        - name: all-icr-io
+      containers:
+      - env:
+        - name: LOGDNA_APIKEY
+          valueFrom:
+            secretKeyRef:
+              name: zero-to-cloud-native-secrets
+              key: LOGDNA_APIKEY
+        - name: LOGDNA_LOGHOST
+          valueFrom:
+            secretKeyRef:
+              name: zero-to-cloud-native-secrets
+              key: LOGDNA_LOGHOST
+        - name: SERVERNAME
+          valueFrom:
+            secretKeyRef:
+              name: zero-to-cloud-native-secrets
+              key: SERVERNAME
+        - name: IAM_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: zero-to-cloud-native-secrets
+              key: IAM_ENDPOINT
+        - name: ENVIRONMENT
+          valueFrom:
+            secretKeyRef:
+              name: zero-to-cloud-native-secrets
+              key: ENVIRONMENT
+        image: us.icr.io/zero-to-cloud-native/utility-02cn:v2
+        name: utility-02cn
+        resources:
+          requests:
+            cpu: 300m
+            memory: "64Mi"
+          limits:
+            cpu: 800m
+            memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: utility-02cn
+  name: utility-02cn-service
+  namespace: zero-to-cloud-native
+spec:
+  ports:
+  - port: 8110
+    protocol: TCP
+    targetPort: 8110
+  selector:
+    run: utility-02cn
+  type: ClusterIP
+
+        
