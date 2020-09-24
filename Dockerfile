@@ -10,4 +10,5 @@ RUN pip3 install -r requirements.txt
 ENV FLASK_APP=utility-02cn.py
 EXPOSE 8110
 ENTRYPOINT [ "python3" ]
+
 CMD [ "app/utility-02cn.py" ]
